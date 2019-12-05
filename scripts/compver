@@ -1,0 +1,114 @@
+#!/bin/bash
+. /lib/lsb/init-functions
+
+package=$1
+
+. $package/Pkgfile
+
+yaover=$version
+
+case $package in
+	qt*)
+		archpackage=${package/qt/qt5-}
+	;;
+	xorg-lib*)
+		archpackage=${package/xorg-/}
+	;;
+	xorg-xf*)
+		archpackage=${package/xorg-/}
+	;;
+	gstreamer-*)
+		archpackage=${package/gstreamer-/gst-}
+	;;
+	*)
+		archpackage=$package
+	;;
+esac
+
+echo -e "\n${SUCCESS}$archpackage search in progress${NORMAL}"
+
+curl -s https://git.archlinux.org/svntogit/community.git/plain/trunk/PKGBUILD?h=packages/$archpackage --output /tmp/$archpackage
+
+. /tmp/$archpackage > /dev/null 2>&1
+
+archversion=$pkgver
+
+rm /tmp/$archpackage
+
+[ -z "$archversion" ] && curl -s https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/$archpackage --output /tmp/$archpackage && . /tmp/$archpackage > /dev/null 2>&1
+
+archversion=$pkgver
+
+rm /tmp/$archpackage > /dev/null 2>&1
+
+[ -z "$archversion" ] && curl -s https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$archpackage --output /tmp/$archpackage && . /tmp/$archpackage > /dev/null 2>&1
+
+archversion=$pkgver
+
+rm /tmp/$archpackage > /dev/null 2>&1
+
+
+
+if [ -z "$archversion" ]
+	then
+		echo -e "\n${WARNING}The $archpackage package is not in Archlinux Distro,\n or with an another name.We don't take care of this one${NORMAL}"
+		archver=$yaover
+	else
+		archver=${archversion%%+*}
+fi
+
+if [ $yaover != $archver ]
+	then
+
+		echo -e "\n${WARNING}Paquet Yao $package à mettre à jour, $yaover vs $archver chez Arch${NORMAL}"
+		echo -e "\n${INFO}Voulez vous mettre à jour la version du Pkgfile $package ?${NORMAL}"
+
+		read a
+
+		case $a in 
+			y|Y|o|O)
+				sed -e "s/version=${yaover}/version=${archver}/" -i $package/Pkgfile
+
+				yaover2=$(cat $package/Pkgfile | grep ^version= | cut -d "=" -f2)
+				if [ $yaover2 == $archver ]
+					then
+						echo -e "\n${SUCCESS}Changes are made${NORMAL}"
+
+						echo -e "\n${INFO}Commit y/n ?${NORMAL}"
+						read b
+
+						case $b in
+							y|Y|o|O)
+								commit $package
+							;;
+
+							n|N)
+								echo -e "\n${INFO} No commit here${NORMAL}"
+							;;
+
+							*)
+								echo -e "\n${INFO}You will commit later${NORMAL}"
+							;;
+						esac
+					else
+						echo -e "\n${FAILURE}Aborting script, changes are not made${NORMAL}"
+						exit 1
+				fi
+			;;
+
+			n|N)
+				echo -e "\n${SUCCESS}Nothing to do for this package $package${NORMAL}"
+			;;
+
+			exit|out|sortie)
+				exit 1
+			;;
+
+			*)
+				echo -e "\n${FAILURE}Bad answer${NORMAL}"
+				exit 1
+			;;
+		esac
+fi
+
+echo -e "\n${INFO}Don't forget to 'git push'${NORMAL}"

@@ -1,0 +1,59 @@
+#!/bin/bash
+usage() {
+
+case $1 in
+	--help|-h|--usage)
+		echo -e "$0 \n\n"Collection" in first argument \n\n"Runtime dependency search in second argument" \n\n"-v if you want for verbose mode"\n"
+	;;
+	*)
+		collection=$1
+		dep=$2
+		verbose=$3
+		searchdep
+	;;
+esac
+
+}
+
+searchdep() {
+
+PACKAGE=/srv/www/x86_64/development/$collection/*
+
+for i in $PACKAGE
+
+	do
+
+	FILE=""$i"/"${i##*/}"1*.cards.tar.xz"
+
+	if [ -f $FILE ]
+
+		then
+			DEPSEARCH=$(tar -Oxf $FILE .META | grep R"$dep"1 | uniq)
+
+			if [ ! -z $DEPSEARCH ]
+
+				then
+
+					echo "${i##*/}"
+
+				else
+
+					[ ! -z $verbose ] && echo -e "No $dep in ${i##*/}"
+
+			fi
+
+		else
+
+			[ ! -z $verbose ] && echo -e "No package ${i##*/} file found, escape this one"
+
+	fi
+
+done
+}
+
+main() {
+
+usage $@
+}
+
+main $@

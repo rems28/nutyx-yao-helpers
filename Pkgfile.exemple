@@ -1,0 +1,32 @@
+# Package description
+description=""
+# URL of the project, not the source
+url=""
+
+# On Yaolinux, packager variable is static, on nutyx, Will may be tnut
+packager="Yaolinux Team"
+# On Yaolinux, maintainer variable is for the package maker
+maintainer=""
+
+# Name of the package, have to be the same as the parent folder
+name=""
+# Package version
+version=""
+
+# Source URL, can contains more than one, patchs included
+source=()
+
+# All the dependencies of the package, runtime deps will be found by the compilation Bot
+# If no need of deps, delete the variable
+makedepends=()
+
+# Optional runtime dependencies, almost python or perl modules have to be noticed here
+# The runtime dependencies have to have placed in the makedepends=() too
+# If no need of deps, delete the variable
+run=()
+
+# Now the recipe of the package, all operations have to be written here betwwen { }, including patchs
+build() {
+
+cd $name-$version
+}

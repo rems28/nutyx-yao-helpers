@@ -1,0 +1,174 @@
+#!/bin/bash
+
+forsource() {
+for file in $package
+
+do
+	community
+done
+}
+
+community() {
+
+echo -e "\n${INFO}Test community repo${NORMAL}"
+
+if [ -z $other ]
+	then
+		file2=$file
+	else
+		file2=$other
+fi
+
+archsource=$(curl -s https://git.archlinux.org/svntogit/community.git/plain/trunk/PKGBUILD?h=packages/$file2 | grep ^source= | cut -d '"' -f2 | cut -d '(' -f2 | cut -d ')' -f1 | sed -e 's/pkgname/name/g' -e 's/pkgver/version/g')
+
+if [ -z $archsource ]
+	then
+                echo -e "\n${WARNING}Not in Arch community repo${NORMAL}"
+		coreextra
+	else
+		archcomsource=$(echo $archsource | sed -e '/git+/d')
+                echo -e "\n${SUCCESS}Package found in Community repo${NORMAL}"
+                testgit $archcomsource
+fi
+}
+
+coreextra() {
+
+echo -e "\n${INFO}Test Core-Extra repo${NORMAL}"
+
+if [ -z $other ]
+	then
+		file2=$file
+	else
+		file2=$other
+fi
+
+archsource=$(curl -s https://git.archlinux.org/svntogit/packages.git/plain/trunk/PKGBUILD?h=packages/$file2 | grep ^source= | cut -d '"' -f2 | cut -d '(' -f2 | cut -d ')' -f1 | sed -e 's/pkgname/name/g' -e 's/pkgver/version/g')
+
+if [ -z $archsource ]
+	then
+                echo -e "\n${WARNING}Not in base, Core, Extra Arch repo${NORMAL}"
+		aur
+	else
+		archcoresource=$(echo $archsource | sed -e '/git+/d')
+                echo -e "\n${SUCCESS}package found in Base, Core, Extra repo${NORMAL}"
+                testgit $archcoresource
+fi
+}
+
+aur() {
+
+echo -e "\n${INFO}Test AUR repo${NORMAL}"
+
+if [ -z $other ]
+	then
+		file2=$file
+	else
+		file2=$other
+fi
+
+archsource=$(curl -s https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$file2 | grep ^source= | cut -d '"' -f2 | cut -d '(' -f2 | cut -d ')' -f1 | sed -e 's/pkgname/name/g' -e 's/pkgver/version/g')
+
+if [ -z $archsource ]
+	then
+		nothinginarchsource
+	else
+		archaursource=$(echo $archsource | sed -e '/git+/d')
+                echo -e "\n${SUCCESS}Package found in AUR repo${NORMAL}"
+                testgit $archaursource
+fi
+}
+
+nothinginarchsource() {
+
+echo -e "\n${FAILURE}No $file2 package in Arch distro${NORMAL}"
+
+echo -e "\n${INFO}Is it a different package in Arch, if also, please enter the good name or type NO if not${NORMAL}"
+
+read other
+case $other in
+	NO|no|n|N)
+		echo -e "\n${WARNING}Very disappointed, make an other try${NORMAL}"
+		exit 1
+	;;
+	*)
+		community
+	;;
+esac
+}
+
+testgit() {
+
+echo -e "\n${INFO}Test git${NORMAL}"
+
+if [ -z $1 ]
+
+	then
+
+	echo -e "\n${FAILURE}Arch source is a git source for this $file2 package${NORMAL}"
+	echo -e "\n$archsource"
+	exit 1
+
+	else
+                echo -e "\n${SUCCESS}Good news, the source is correct${NORMAL}"
+		echo -e "\n${INFO}Package $file2 is ready to Sed the source${NORMAL}"
+		sedpackage
+fi
+}
+
+sedpackage() {
+
+yaosource=$(cat $package/Pkgfile | grep ^source= | cut -d "(" -f2 | cut -d ")" -f1)
+
+echo -e "\n${WARNING}$yaosource${NORMAL}"
+
+echo -e "\n${WARNING}$archsource${NORMAL}"
+
+[ $yaosource == $archsource ] && echo -e "\n${WARNING}Same sources in both packages${NORMAL}" && exit 1
+sedquestion
+}
+
+sedquestion() {
+
+echo -e "\n${INFO}Ready to replace the source ?\nMaybe the found package isn't correct, type other in this case${NORMAL}\n"
+
+read answer
+
+case $answer in
+	y|Y|o|O)
+		echo -e "\n${INFO}Changing source \n\n$yaosource \n\nby\n\n $archsource \n\nin package $file2${NORMAL}\n"
+
+		sed -e "s@$yaosource@$archsource@" -i $package/Pkgfile
+
+		yaosource2=$(cat $package/Pkgfile | grep ^source= | cut -d "(" -f2 | cut -d ")" -f1)
+
+		[ $yaosource2 == $archsource ] && echo -e "\n${SUCCESS}Well done, Sir${NORMAL}"
+	;;
+	n|N)
+		echo -e "\n${INFO}Your desire is order${NORMAL}"
+		exit 1
+	;;
+	other)
+		echo -e "\n${INFO}Go to search another package${NORMAL}"
+		nothinginarchsource
+	;;
+	exit|bye)
+		echo -e "\n${INFO}Make bye, goodbye${NORMAL}"
+		exit 1
+	;;
+	*)
+		echo -e "\n${FAILURE}Bad answer, restart the question${NORMAL}"
+		unset answer
+		sedquestion
+	;;
+esac
+}
+
+main() {
+. /lib/lsb/init-functions
+package=$1
+unset $1
+forsource
+}
+
+main $@

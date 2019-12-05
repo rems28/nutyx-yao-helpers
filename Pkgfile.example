@@ -1,0 +1,17 @@
+description=""
+url=""
+
+packager="Yaolinux Team"
+maintainer=""
+
+name=""
+version=""
+
+source=()
+
+makedepends=()
+
+build() {
+
+cd $name-$version
+}

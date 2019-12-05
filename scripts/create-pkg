@@ -1,0 +1,144 @@
+#!/bin/bash
+
+[ $PWD != $HOME ] && echo -e "You're not in your $HOME folder" && exit 1
+
+[ ! -f Pkgfile.example ] && echo -e "Can not find Pkgfile.example, the template file for making a Pkgfile for your package" && exit 1
+
+if [ -z $EDITOR ]
+	then
+		echo -e "\nEDITOR variable not set, please choose one between"
+		echo -e "\ne3, vim and nano"
+		read edit
+		case $edit in
+			e3|vi|vim|nano)
+				echo -e "\nOk, thanks"
+			;;
+			*)
+				echo -e "\nbad choice, aborting..."
+			;;
+		esac
+	else
+		edit=$EDITOR
+fi
+
+echo -e "\nIn which collection do you want to create your recipe ?\n"
+echo -e "\nPossibles answers are\nbase, cli, gui, cli-extra, gui-extra"
+echo -e "\nkde5, gnome, lxde, xfce4, mate, nos ?"
+read collection
+
+echo -e "\nWhat is the name of the package you want to build"
+read package
+
+case $collection in
+	base)
+		[ ! -d $HOME/git/development/base-sysd ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/base-sysd/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/base-sysd/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+		sleep 3
+		$edit $HOME/git/development/base-sysd/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+		echo -e "\n $HOME/git/development/base-sysd/$collection/$package/Pkgfile"
+		exit 0
+	;;
+
+	cli|gui)
+		[ ! -d $HOME/git/development/core ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/core/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/core/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/core/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/core/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	cli-extra|gui-extra)
+		[ ! -d $HOME/git/development/extra ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/extra/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/extra/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/extra/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/extra/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	kde5|kde5-extra)
+		[ ! -d $HOME/git/development/kde5 ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/kde5/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/kde5/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/kde5/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/kde5/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	gnome|gnome-extra)
+		[ ! -d $HOME/git/development/kde5 ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/gnome/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/gnome/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/gnome/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/gnome/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	lxde|lxde-extra)
+		[ ! -d $HOME/git/development/kde5 ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/lxde/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/lxde/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/lxde/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/lxde/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	xfce4|xfce4-extra)
+		[ ! -d $HOME/git/development/xfce4 ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/xfce4/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/xfce4/$collection/$package/Pkgfile
+                echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/xfce4/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/xfce4/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	mate|mate-extra)
+		[ ! -d $HOME/git/development/mate ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/mate/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/mate/$collection/$package/Pkgfile
+                echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/mate/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/mate/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	nos)
+		[ ! -d $HOME/git/development/nos ] && echo -e "\nYour local git repo is not at the right place or\nyou don't make the git clone before starting the script" && exit 1
+		mkdir -pv $HOME/git/development/nos/$collection/$package/
+		cat Pkgfile.example > $HOME/git/development/nos/$collection/$package/Pkgfile
+		echo -e "Now, finalize the Pkgfile"
+                sleep 3
+                $edit $HOME/git/development/nos/$collection/$package/Pkgfile
+		echo -e "\nYou'll found your Pkgfile here"
+                echo -e "\n $HOME/git/development/nos/$collection/$package/Pkgfile"
+                exit 0
+	;;
+
+	*)
+		echo -e "This collection $collection does not exist, aborting..." && exit 1
+	;;
+esac
