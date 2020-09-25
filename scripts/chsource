@@ -27,6 +27,7 @@ if [ -z $archsource ]
 		coreextra
 	else
 		archcomsource=$(echo $archsource | sed -e '/git+/d')
+                archcomsource=${archcomsource##*::}
                 echo -e "\n${SUCCESS}Package found in Community repo${NORMAL}"
                 testgit $archcomsource
 fi
@@ -51,6 +52,7 @@ if [ -z $archsource ]
 		aur
 	else
 		archcoresource=$(echo $archsource | sed -e '/git+/d')
+                archcoresource=${archcoresource##*::}
                 echo -e "\n${SUCCESS}package found in Base, Core, Extra repo${NORMAL}"
                 testgit $archcoresource
 fi
@@ -74,6 +76,7 @@ if [ -z $archsource ]
 		nothinginarchsource
 	else
 		archaursource=$(echo $archsource | sed -e '/git+/d')
+                archaursource=${archaursource##*::}
                 echo -e "\n${SUCCESS}Package found in AUR repo${NORMAL}"
                 testgit $archaursource
 fi
@@ -112,6 +115,7 @@ if [ -z $1 ]
 	else
                 echo -e "\n${SUCCESS}Good news, the source is correct${NORMAL}"
 		echo -e "\n${INFO}Package $file2 is ready to Sed the source${NORMAL}"
+                correctsource=$1
 		sedpackage
 fi
 }
@@ -122,9 +126,9 @@ yaosource=$(cat $package/Pkgfile | grep ^source= | cut -d "(" -f2 | cut -d ")" -
 
 echo -e "\n${WARNING}$yaosource${NORMAL}"
 
-echo -e "\n${WARNING}$archsource${NORMAL}"
+echo -e "\n${WARNING}$correctsource${NORMAL}"
 
-[ $yaosource == $archsource ] && echo -e "\n${WARNING}Same sources in both packages${NORMAL}" && exit 1
+[ $yaosource == $correctsource ] && echo -e "\n${WARNING}Same sources in both packages${NORMAL}" && exit 1
 sedquestion
 }
 
@@ -136,13 +140,13 @@ read answer
 
 case $answer in
 	y|Y|o|O)
-		echo -e "\n${INFO}Changing source \n\n$yaosource \n\nby\n\n $archsource \n\nin package $file2${NORMAL}\n"
+		echo -e "\n${INFO}Changing source \n\n$yaosource \n\nby\n\n $correctsource \n\nin package $file2${NORMAL}\n"
 
-		sed -e "s@$yaosource@$archsource@" -i $package/Pkgfile
+		sed -e "s@$yaosource@$correctsource@" -i $package/Pkgfile
 
 		yaosource2=$(cat $package/Pkgfile | grep ^source= | cut -d "(" -f2 | cut -d ")" -f1)
 
-		[ $yaosource2 == $archsource ] && echo -e "\n${SUCCESS}Well done, Sir${NORMAL}"
+		[ $yaosource2 == $correctsource ] && echo -e "\n${SUCCESS}Well done, Sir${NORMAL}"
 	;;
 	n|N)
 		echo -e "\n${INFO}Your desire is order${NORMAL}"

@@ -1,0 +1,60 @@
+#!/bin/bash
+usage() {
+
+case $1 in
+	--help|-h|--usage)
+		echo -e "$0 \n\n"Collection" in first argument \n\n".la libs search tool" \n\n"-v if you want for verbose mode"\n"
+	;;
+	*)
+		collection=$1
+		verbose=$2
+		searchlalibs
+	;;
+esac
+
+}
+
+searchlalibs() {
+
+PACKAGE=/srv/www/x86_64/development/$collection/*
+
+for i in $PACKAGE
+
+	do
+
+	FILE=""$i"/"${i##*/}"1*.cards.tar.xz"
+
+	if [ -f $FILE ]
+
+		then
+			LALIBSSEARCH=$(tar -tf $FILE | grep -i "\.la\>")
+
+			if [[ ! -z $LALIBSSEARCH ]]
+
+				then
+
+					echo -e "${i##*/}"
+					echo -e "${LALIBSSEARCH[@]}"
+					unset LALIBSSEARCH
+
+				else
+
+					[ ! -z $verbose ] && echo -e "No .la in ${i##*/}"
+
+			fi
+
+		else
+
+			[ ! -z $verbose ] && echo -e "No package ${i} file found, escape this one"
+
+	fi
+
+done
+}
+
+main() {
+
+usage $@
+}
+
+main $@

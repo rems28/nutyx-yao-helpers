@@ -1,7 +1,8 @@
 #!/bin/bash
-. /lib/lsb/init-functions
 
-package=$1
+init() {
+
+[ ! -d $package ] && echo -e "\n${FAILURE}Your arg is not a package folder${NORMAL}" && exit 1
 
 . $package/Pkgfile
 
@@ -25,6 +26,10 @@ case $package in
 	;;
 esac
 
+search
+}
+
+search() {
 echo -e "\n${SUCCESS}$archpackage search in progress${NORMAL}"
 
 curl -s https://git.archlinux.org/svntogit/community.git/plain/trunk/PKGBUILD?h=packages/$archpackage --output /tmp/$archpackage
@@ -46,9 +51,10 @@ rm /tmp/$archpackage > /dev/null 2>&1
 archversion=$pkgver
 
 rm /tmp/$archpackage > /dev/null 2>&1
+test
+}
 
-
-
+test() {
 if [ -z "$archversion" ]
 	then
 		echo -e "\n${WARNING}The $archpackage package is not in Archlinux Distro,\n or with an another name.We don't take care of this one${NORMAL}"
@@ -60,12 +66,12 @@ fi
 if [ $yaover != $archver ]
 	then
 
-		echo -e "\n${WARNING}Paquet Yao $package à mettre à jour, $yaover vs $archver chez Arch${NORMAL}"
-		echo -e "\n${INFO}Voulez vous mettre à jour la version du Pkgfile $package ?${NORMAL}"
+		echo -e "\n${WARNING}Yao package $package need update, $yaover vs $archver in Arch${NORMAL}"
+		echo -e "\n${INFO}Do you want to update the Pkgfile version $package ?${NORMAL}"
 
 		read a
 
-		case $a in 
+		case $a in
 			y|Y|o|O)
 				sed -e "s/version=${yaover}/version=${archver}/" -i $package/Pkgfile
 
@@ -74,22 +80,6 @@ if [ $yaover != $archver ]
 					then
 						echo -e "\n${SUCCESS}Changes are made${NORMAL}"
 
-						echo -e "\n${INFO}Commit y/n ?${NORMAL}"
-						read b
-
-						case $b in
-							y|Y|o|O)
-								commit $package
-							;;
-
-							n|N)
-								echo -e "\n${INFO} No commit here${NORMAL}"
-							;;
-
-							*)
-								echo -e "\n${INFO}You will commit later${NORMAL}"
-							;;
-						esac
 					else
 						echo -e "\n${FAILURE}Aborting script, changes are not made${NORMAL}"
 						exit 1
@@ -110,5 +100,14 @@ if [ $yaover != $archver ]
 			;;
 		esac
 fi
+}
 
-echo -e "\n${INFO}Don't forget to 'git push'${NORMAL}"
+main() {
+. /lib/lsb/init-functions
+
+package=$1
+
+init $@
+}
+
+main $@
