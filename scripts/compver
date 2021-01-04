@@ -69,13 +69,14 @@ if [ $yaover != $archver ]
 		echo -e "\n${WARNING}Yao package $package need update, $yaover vs $archver in Arch${NORMAL}"
 		echo -e "\n${INFO}Do you want to update the Pkgfile version $package ?${NORMAL}"
 
-		read a
+		read answer
 
-		case $a in
+		case $answer in
 			y|Y|o|O)
-				sed -e "s/version=${yaover}/version=${archver}/" -i $package/Pkgfile
-
-				yaover2=$(cat $package/Pkgfile | grep ^version= | cut -d "=" -f2)
+				sed -e "/version=/s/${yaover}/${archver}/" -i $package/Pkgfile
+				cp -a $package /tmp/
+				. /tmp/$package/Pkgfile
+				yaover2=$version
 				if [ $yaover2 == $archver ]
 					then
 						echo -e "\n${SUCCESS}Changes are made${NORMAL}"
