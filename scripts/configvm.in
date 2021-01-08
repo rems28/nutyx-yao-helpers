@@ -412,7 +412,9 @@ case ${_TYPE} in
 create_vm_uefi() {
 local CREATE_STATE
 
-if [[ ! -f /usr/share/OVMF/OVMF_VARS.fd ]] || /usr/share/ovmf/OVMF_VARS.fd ]] || /usr/share/edk2-ovmf/OVMF_VARS.fd ]]
+_OVMF_CHECK=$(find /usr/share -iname "OVMF_VARS.fd")
+
+if [[ -z ${_OVMF_CHECK} ]]
         then
                 _error "Veuillez installer le paquet OVMF ou apparenté pour créer une VM avec UEFI"
 fi
