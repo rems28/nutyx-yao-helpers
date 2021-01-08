@@ -191,6 +191,7 @@ case $vgaquery in
         cirrus)
         	vga=cirrus
 		$ECHOCMD "VGA_HARDWARE_TYPE=$vga" >> ${_FULLPATHNAME}/${_NAME}.var
+		$ECHOCMD "VGA_MEMORY_SIZE=8M" >> ${_FULLPATHNAME}/${_NAME}.var
         	_success "La carte graphique sera $vga"
         ;;
         qxl)

@@ -68,6 +68,24 @@ case $SOUND_CARD_TYPE in
         ;;
 	*)
 		_SNDHW_CMDLINE="-soundhw $SOUND_CARD_TYPE"
+	;;
+esac
+}
+
+vga_cmdline() {
+case $VGA_HARDWARE_TYPE in
+        virtio|Virtio|VIRTIO)
+                _VGA_CMDLINE="-device virtio-vga,max_hostmem=$(( ${VGA_MEMORY_SIZE/[A-Z]*/} * 1024 * 1024 ))"
+        ;;
+        qxl|Qxl|QXL)
+                _VGA_CMDLINE="-device qxl-vga,vgamem_mb=${VGA_MEMORY_SIZE/[A-Z]*/}"
+        ;;
+        cirrus|Cirrus|CIRRUS)
+                _VGA_CMDLINE="-device cirrus-vga,vgamem_mb=${VGA_MEMORY_SIZE/[A-Z]*/}"
+        ;;
+        *)
+                _VGA_CMDLINE="-vga $VGA_HARDWARE_TYPE"
+	;;
 esac
 }
 
@@ -87,6 +105,7 @@ case $VGA_DISPLAY_TYPE in
 	;;
 	*)
 		_DISPLAY_CMDLINE="-display $VGA_DISPLAY_TYPE"
+	;;
 esac
 }
 
@@ -105,7 +124,7 @@ ${_UEFI_VAR_CMDLINE}
 -drive file=$HDD1_NAME,if=$HDD1_CONTROLLER_TYPE
 ${_ISO_CMDLINE}
 -boot menu=on
--vga $VGA_HARDWARE_TYPE
+${_VGA_CMDLINE}
 ${_SNDHW_CMDLINE}
 -nodefaults
 ${_DISPLAY_CMDLINE}
@@ -123,7 +142,7 @@ $QEMU_BIN -enable-kvm -M q35 -m $SYSTEM_MEMORY_SIZE -cpu $CPU_TYPE -smp cores=$N
           -drive file=$HDD1_NAME,if=$HDD1_CONTROLLER_TYPE \
           ${_ISO_CMDLINE} \
           -boot menu=on  \
-          -vga $VGA_HARDWARE_TYPE \
+          ${_VGA_CMDLINE} \
           ${_SNDHW_CMDLINE} \
           -nodefaults \
           ${_DISPLAY_CMDLINE} \
@@ -139,6 +158,7 @@ check_hdd1_file
 uefi_bioscmdline
 iso_disk_cmdline
 sndhw_cmdline
+vga_cmdline
 display_cmdline
 qemu_cmdline
 }
