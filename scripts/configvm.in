@@ -218,7 +218,7 @@ esac
 displayquery() {
 if [[ -z $display ]]
 	then
-		_info "Quel type de sortie graphique ? (spice par défaut, vnc, nographic, local (besoin de virt-viwer 8.0)"
+		_info "Quel type de sortie graphique ? (spice par défaut, vnc, local (besoin de virt-viewer 8.0)"
 		read displayquery
 		[[ -z $displayquery ]] && displayquery=spice
 		case $displayquery in
