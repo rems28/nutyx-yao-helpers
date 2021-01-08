@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 _error() {
 
@@ -63,9 +63,11 @@ case $SOUND_CARD_TYPE in
         none|NONE|no)
                 _SNDHW_CMDLINE=""
         ;;
-        *)
-                _SNDHW_CMDLINE="-soundhw $SOUND_CARD_TYPE"
+        ac97)
+                _SNDHW_CMDLINE="-device AC97"
         ;;
+	*)
+		_SNDHW_CMDLINE="-soundhw $SOUND_CARD_TYPE"
 esac
 }
 
