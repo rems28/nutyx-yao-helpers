@@ -48,7 +48,7 @@ esac
 }
 
 iso_disk_cmdline() {
-case $BIOS_TYPE_INFO in
+case $ISO_FILE in
         no|NO|none|NONE)
                 _ISO_CMDLINE=""
         ;;
